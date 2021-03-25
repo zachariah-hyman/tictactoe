@@ -3,7 +3,6 @@ from pygame.locals import *
 
 moves = []
 rects = []
-gameOver = False
 
 # Initialize program
 pygame.init()
@@ -24,35 +23,28 @@ DISPLAYSURF = pygame.display.set_mode((300,400))
 DISPLAYSURF.fill(WHITE)
 pygame.display.set_caption("Tic Tac Toe")
 
-def displayWin(c):
-    gameOver = True
-    myfont = pygame.font.SysFont(None,100) # use default system font, size 100
-    mytext = myfont.render("{character} Wins!".format(character = c), True, GREEN)
-    DISPLAYSURF.blit(mytext, (25,325))
-    pygame.display.flip() # update the display
-
 def checkWin(c):
     if moves[0] == c and moves[1] == c and moves[2] == c:
-        displayWin(c)
+        return True
     elif moves[3] == c and moves[4] == c and moves[5] == c:
-        displayWin(c)
+        return True
     elif moves[6] == c and moves[7] == c and moves[8] == c:
-        displayWin(c)
+        return True
 
-def drawX(rect, xTurn):
+    return False
+
+def drawX(rect):
     pygame.draw.line(DISPLAYSURF, RED, (rect.centerx - 25, rect.centery - 25), (rect.centerx + 25, rect.centery + 25), 2)
 
     pygame.draw.line(DISPLAYSURF, RED, (rect.centerx - 25, rect.centery + 25), (rect.centerx + 25, rect.centery - 25), 2)
 
     moves.pop(rects.index(rect))
     moves.insert(rects.index(rect), "X")
-    checkWin('X')
 
-def drawO(rect, xTurn):
+def drawO(rect):
     moves.pop(rects.index(rect))
     moves.insert(rects.index(rect), 'O')
     pygame.draw.circle(DISPLAYSURF, BLUE, rect.center, 25, 2)
-    checkWin('O')
 
 # define a main function
 def main():
@@ -63,28 +55,44 @@ def main():
             rects.append(pygame.Rect((i*100, j*100), (98, 98)))
             moves.append(' ')
 
-    screen = pygame.draw.rect(DISPLAYSURF, BLACK, (0, 300, 300, 100))
+    pygame.draw.rect(DISPLAYSURF, BLACK, (0, 300, 300, 100), 0)
+    myfont = pygame.font.SysFont(None,100) # use default system font, size 100
+    mytext = myfont.render("X's Turn", True, WHITE)
+    DISPLAYSURF.blit(mytext, (25,325))
+    pygame.display.update()
 
-    xTurn = False
+    gameOver = False
+    xTurn = True
 
     while True:
-        pygame.display.update()
-
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEBUTTONDOWN:
+            elif event.type == MOUSEBUTTONDOWN and gameOver == False:
                 mouse_pos = pygame.mouse.get_pos()
                 for rect in rects:
-                    if rect.collidepoint(mouse_pos):
+                    if rect.collidepoint(mouse_pos) and moves[rects.index(rect)] == ' ':
                         if xTurn == True:
-                            drawX(rect, xTurn)
-                            xTurn = False
+                            drawX(rect)
+                            if checkWin('X') == False:
+                                xTurn = False
+                                mytext = myfont.render("O's Turn", True, WHITE)
+                            else:
+                                mytext = myfont.render("X Wins!", True, GREEN)
+                                gameOver = True
                         elif xTurn == False:
-                            drawO(rect, xTurn)
-                            xTurn = True
+                            drawO(rect)
+                            if checkWin('O') == False:
+                                xTurn = True
+                                mytext = myfont.render("X's Turn", True, WHITE)
+                            else:
+                                mytext = myfont.render("O Wins!", True, GREEN)
+                                gameOver = True
                         print(moves)
+                        pygame.draw.rect(DISPLAYSURF, BLACK, (0, 300, 300, 100), 0)
+                        DISPLAYSURF.blit(mytext, (25,325))
+                        pygame.display.update()
 
         FramePerSec.tick(FPS)
 
