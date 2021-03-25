@@ -30,6 +30,16 @@ def checkWin(c):
         return True
     elif moves[6] == c and moves[7] == c and moves[8] == c:
         return True
+    elif moves[0] == c and moves[4] == c and moves[8] == c:
+        return True
+    elif moves[2] == c and moves[4] == c and moves[6] == c:
+        return True
+    elif moves[0] == c and moves[3] == c and moves[6] == c:
+        return True
+    elif moves[1] == c and moves[4] == c and moves[7] == c:
+        return True
+    elif moves[2] == c and moves[5] == c and moves[8] == c:
+        return True
 
     return False
 
@@ -63,6 +73,7 @@ def main():
 
     gameOver = False
     xTurn = True
+    count = 0
 
     while True:
         for event in pygame.event.get():
@@ -73,19 +84,28 @@ def main():
                 mouse_pos = pygame.mouse.get_pos()
                 for rect in rects:
                     if rect.collidepoint(mouse_pos) and moves[rects.index(rect)] == ' ':
+                        count += 1
                         if xTurn == True:
                             drawX(rect)
                             if checkWin('X') == False:
-                                xTurn = False
-                                mytext = myfont.render("O's Turn", True, WHITE)
+                                if count == 9:
+                                    mytext = myfont.render("Draw!", True, WHITE)
+                                    gameOver = True
+                                else:
+                                    xTurn = False
+                                    mytext = myfont.render("O's Turn", True, WHITE)
                             else:
                                 mytext = myfont.render("X Wins!", True, GREEN)
                                 gameOver = True
                         elif xTurn == False:
                             drawO(rect)
                             if checkWin('O') == False:
-                                xTurn = True
-                                mytext = myfont.render("X's Turn", True, WHITE)
+                                if count == 9:
+                                    mytext = myfont.render("Draw!", True, WHITE)
+                                    gameOver = True
+                                else:
+                                    xTurn = True
+                                    mytext = myfont.render("X's Turn", True, WHITE)
                             else:
                                 mytext = myfont.render("O Wins!", True, GREEN)
                                 gameOver = True
